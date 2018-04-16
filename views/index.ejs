@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; max-width: 500px;
+margin: 0px auto; }
+      form { background: #fff; padding: 3px; position: fixed; bottom: 0; width: 500px; }
+      form input { border: 1; padding: 10px; width: 100%; margin-right: .5%; }
+      form button { width: 100%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #connectstatus { width: inherit; height: 50px; overflow: scroll;}
+    </style>
+  </head>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+$(function () {
+  var nickname = '<%- nickname %>';
+    var socket = io();
+    $('form').submit(function() {
+        var m = { message: $('#m').val(), nickname: nickname};
+        socket.emit('chat message', m);
+        $('#m').val();
+        $('#typing').css({display: 'none'});
+        return false;
+    });
+
+    $('#m').on('keypress', function() {
+      socket.emit('typing');
+    });
+  
+    socket.on('chat message', function(msg) {
+        $('#messages').append($(`<li>`).html(`<b>${msg.nickname}</b> <br> ${msg.message} - ${new Date()}`));
+    });
+
+    socket.on('typing', function() {
+        $('#typing').html('<b>someone is typing...</b>');
+        $('#typing').css({display: 'block'})
+    });
+
+    socket.on('connect', function() {
+        $('#connectstatus').append($('<li>').html(`<b>${nickname}</b> connected at ${new Date()}`));
+    });
+    socket.on('disconnect', function() {
+        $('#connectstatus').append($('<li>').html(`<b>${nickname}</b> disconnected at ${new Date()}`));
+    });
+});
+</script>
+  <body>
+    <ul id="connectstatus"></ul>
+    <ul id="messages"></ul>
+    <span id="typing"></span>
+    <form action="">
+      <input id="m" autocomplete="off" />
+      <button>Send</button>
+    </form>
+  </body>
+</html>

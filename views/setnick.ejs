@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; max-width: 500px;
+margin: 0px auto; }
+      form { margin: 0px auto; }
+      form button { background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #connectstatus { width: inherit; height: 50px; overflow: scroll;}
+      h1 { text-align: center; }
+      label { text-align: center; }
+      input[type="text"] { text-align: center; margin: 0px auto; padding: 9px; }
+    </style>
+  </head>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+$(function() {
+  $('#submit').click(function(e) {
+      e.preventDefault();
+    var error = false;
+    var nickname = $('#nickname').val();
+    if(nickname == '' || nickname == null) {
+        alert('Please type in a nickname');
+        error = true;
+    }
+
+    if(error === false) {
+        $.post('/setnick', { nickname: nickname }, function(res) {
+            console.log(res);
+            if(res.status == 'ok') {
+                location.reload();
+            } else {
+                alert(res.data);
+            }
+        })
+    }
+});
+});
+</script>
+  <body>
+    <h1>Hi, thanks for joining the group chat! to get started please provide a nickname</h1>
+   <form action="">
+    <label for="nicknames">Nickname</label>
+    <input name="nickname" type="text" id="nickname" />
+    <button type="submit" id="submit">Submit</button>
+    </form>
+  </body>
+</html>
